@@ -262,11 +262,15 @@ $wish_count = getWishlistCount();
                                     </div>
 
                                     <div class="product-actions">
-                                        <button class="product-action-btn <?= $p['is_liked'] ? 'liked' : '' ?>"
-                                            onclick="Wishlist.toggle(<?= $p['id'] ?>, this)"
-                                            title="<?= $p['is_liked'] ? 'Remove from wishlist' : 'Add to wishlist' ?>">
-                                            <i class="bi bi-heart<?= $p['is_liked'] ? '-fill' : '' ?>"></i>
-                                        </button>
+                                        <div class="wish-btn-wrap">
+                                            <button class="product-action-btn <?= $p['is_liked'] ? 'liked' : '' ?>"
+                                                onclick="Wishlist.toggle(<?= $p['id'] ?>, this)"
+                                                title="<?= $p['is_liked'] ? 'Remove from wishlist' : 'Add to wishlist' ?>">
+                                                <i class="bi bi-heart<?= $p['is_liked'] ? '-fill' : '' ?>"></i>
+                                            </button>
+                                            <span
+                                                class="wish-label"><?= $p['is_liked'] ? 'Remove from Wishlist' : 'Add to Wishlist' ?></span>
+                                        </div>
                                         <button class="product-action-btn quickview-btn"
                                             onclick="QuickView.open(<?= $p['id'] ?>)" title="Quick View">
                                             <i class="bi bi-eye"></i>
@@ -370,14 +374,39 @@ $wish_count = getWishlistCount();
         }
 
         .sidebar-cat-link:hover {
-            background: rgba(108, 99, 255, 0.08);
-            color: var(--text-primary);
+            background: #fff3f0;
+            color: var(--primary);
         }
 
         .sidebar-cat-link.active {
-            background: rgba(108, 99, 255, 0.12);
-            color: var(--primary-light);
+            background: #fff3f0;
+            color: var(--primary);
             font-weight: 600;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Wishlist button with label */
+        .wish-btn-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wish-label {
+            display: none;
+            background: rgba(30, 30, 30, 0.82);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .wish-btn-wrap:hover .wish-label {
+            display: block;
         }
 
         @media (max-width: 768px) {

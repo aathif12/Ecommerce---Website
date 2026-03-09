@@ -192,12 +192,13 @@ const Wishlist = {
   async toggle(productId, btn = null) {
     // Optimistic UI: immediately flip icon before the request completes
     if (btn) {
-      const icon = btn.querySelector('i');
+      const icon  = btn.querySelector('i');
+      const label = btn.closest('.wish-btn-wrap')?.querySelector('.wish-label');
       const isCurrentlyLiked = btn.classList.contains('liked');
+
       btn.classList.toggle('liked', !isCurrentlyLiked);
-      if (icon) {
-        icon.className = isCurrentlyLiked ? 'bi bi-heart' : 'bi bi-heart-fill';
-      }
+      if (icon)  icon.className  = isCurrentlyLiked ? 'bi bi-heart' : 'bi bi-heart-fill';
+      if (label) label.textContent = isCurrentlyLiked ? 'Add to Wishlist' : 'Remove from Wishlist';
       btn.title = isCurrentlyLiked ? 'Add to wishlist' : 'Remove from wishlist';
     }
 
@@ -205,13 +206,13 @@ const Wishlist = {
 
     if (res.success) {
       Toast[res.liked ? 'success' : 'info'](res.message);
-      // Confirm final state from server (in case optimistic update was wrong)
+      // Confirm final state from server
       if (btn) {
-        const icon = btn.querySelector('i');
+        const icon  = btn.querySelector('i');
+        const label = btn.closest('.wish-btn-wrap')?.querySelector('.wish-label');
         btn.classList.toggle('liked', res.liked);
-        if (icon) {
-          icon.className = res.liked ? 'bi bi-heart-fill' : 'bi bi-heart';
-        }
+        if (icon)  icon.className  = res.liked ? 'bi bi-heart-fill' : 'bi bi-heart';
+        if (label) label.textContent = res.liked ? 'Remove from Wishlist' : 'Add to Wishlist';
         btn.title = res.liked ? 'Remove from wishlist' : 'Add to wishlist';
       }
       // Update navbar wishlist badge count
@@ -223,18 +224,19 @@ const Wishlist = {
     } else {
       // Revert optimistic update on error
       if (btn) {
-        const icon = btn.querySelector('i');
+        const icon  = btn.querySelector('i');
+        const label = btn.closest('.wish-btn-wrap')?.querySelector('.wish-label');
         const rolledBack = !btn.classList.contains('liked');
         btn.classList.toggle('liked', rolledBack);
-        if (icon) {
-          icon.className = rolledBack ? 'bi bi-heart-fill' : 'bi bi-heart';
-        }
+        if (icon)  icon.className  = rolledBack ? 'bi bi-heart-fill' : 'bi bi-heart';
+        if (label) label.textContent = rolledBack ? 'Remove from Wishlist' : 'Add to Wishlist';
       }
       if (res.redirect) window.location.href = res.redirect;
       else Toast.error(res.error || 'Failed to update wishlist');
     }
   }
 };
+
 
 // ===== QUICK VIEW MODAL =====
 const QuickView = {
