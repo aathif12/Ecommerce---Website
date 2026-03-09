@@ -128,7 +128,7 @@ const Navbar = {
     const dropdown = document.getElementById('search-dropdown');
     dropdown.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted)"><i class="bi bi-arrow-repeat spin"></i> Searching...</div>';
     dropdown.classList.add('active');
-    const res = await Ajax.get('api/search.php', { q });
+    const res = await Ajax.get('/api/search.php', { q });
     if (res.products && res.products.length) {
       dropdown.innerHTML = res.products.map(p => `
         <div class="search-result-item" onclick="window.location='user/product.php?id=${p.id}'">
@@ -148,7 +148,7 @@ const Navbar = {
 const Cart = {
   async add(productId, quantity = 1, btn = null) {
     if (btn) { btn.classList.add('adding'); btn.innerHTML = '<i class="bi bi-check2"></i>'; }
-    const res = await Ajax.post('api/cart.php', { action: 'add', product_id: productId, quantity });
+    const res = await Ajax.post('/api/cart.php', { action: 'add', product_id: productId, quantity });
     if (res.success) {
       Toast.success(res.message || 'Added to cart!');
       Cart.updateCount(res.count);
@@ -164,7 +164,7 @@ const Cart = {
   },
 
   async remove(productId) {
-    const res = await Ajax.post('api/cart.php', { action: 'remove', product_id: productId });
+    const res = await Ajax.post('/api/cart.php', { action: 'remove', product_id: productId });
     if (res.success) {
       Toast.info('Removed from cart');
       Cart.updateCount(res.count);
@@ -175,7 +175,7 @@ const Cart = {
   },
 
   async update(productId, quantity) {
-    return await Ajax.post('api/cart.php', { action: 'update', product_id: productId, quantity });
+    return await Ajax.post('/api/cart.php', { action: 'update', product_id: productId, quantity });
   },
 
   updateCount(count) {
@@ -190,20 +190,46 @@ const Cart = {
 // ===== WISHLIST / LIKES =====
 const Wishlist = {
   async toggle(productId, btn = null) {
-    const res = await Ajax.post('api/likes.php', { action: 'toggle', product_id: productId });
+    // Optimistic UI: immediately flip icon before the request completes
+    if (btn) {
+      const icon = btn.querySelector('i');
+      const isCurrentlyLiked = btn.classList.contains('liked');
+      btn.classList.toggle('liked', !isCurrentlyLiked);
+      if (icon) {
+        icon.className = isCurrentlyLiked ? 'bi bi-heart' : 'bi bi-heart-fill';
+      }
+      btn.title = isCurrentlyLiked ? 'Add to wishlist' : 'Remove from wishlist';
+    }
+
+    const res = await Ajax.post('/api/likes.php', { action: 'toggle', product_id: productId });
+
     if (res.success) {
       Toast[res.liked ? 'success' : 'info'](res.message);
+      // Confirm final state from server (in case optimistic update was wrong)
       if (btn) {
+        const icon = btn.querySelector('i');
         btn.classList.toggle('liked', res.liked);
+        if (icon) {
+          icon.className = res.liked ? 'bi bi-heart-fill' : 'bi bi-heart';
+        }
         btn.title = res.liked ? 'Remove from wishlist' : 'Add to wishlist';
       }
-      // Update wishlist count badge
+      // Update navbar wishlist badge count
       const badge = document.getElementById('wishlist-count');
       if (badge && res.total !== undefined) {
         badge.textContent = res.total;
         badge.style.display = res.total > 0 ? 'flex' : 'none';
       }
     } else {
+      // Revert optimistic update on error
+      if (btn) {
+        const icon = btn.querySelector('i');
+        const rolledBack = !btn.classList.contains('liked');
+        btn.classList.toggle('liked', rolledBack);
+        if (icon) {
+          icon.className = rolledBack ? 'bi bi-heart-fill' : 'bi bi-heart';
+        }
+      }
       if (res.redirect) window.location.href = res.redirect;
       else Toast.error(res.error || 'Failed to update wishlist');
     }
@@ -219,7 +245,7 @@ const QuickView = {
     const content = document.getElementById('quick-view-content');
     content.innerHTML = `<div style="padding:60px;text-align:center"><i class="bi bi-arrow-repeat spin" style="font-size:2rem;color:var(--primary-light)"></i></div>`;
 
-    const res = await Ajax.get('api/product.php', { id: productId });
+    const res = await Ajax.get('/api/product.php', { id: productId });
     if (res.product) {
       const p = res.product;
       const price = p.sale_price ? `<span class="product-price">$${parseFloat(p.sale_price).toFixed(2)}</span> <span class="product-old-price">$${parseFloat(p.price).toFixed(2)}</span>` : `<span class="product-price">$${parseFloat(p.price).toFixed(2)}</span>`;
