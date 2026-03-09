@@ -208,11 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Don't have an account? <a href="register.php">Create one →</a>
             </div>
 
-            <div class="demo-accounts">
-                <h4><i class="bi bi-info-circle"></i> Demo Accounts</h4>
-                <div class="demo-row"><span>Admin:</span> <code>admin@elecstore.com / password</code></div>
-                <div class="demo-row"><span>User:</span> <code>Register a new account</code></div>
-            </div>
+
         </div>
     </div>
 
