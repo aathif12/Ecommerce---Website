@@ -267,8 +267,8 @@ $wish_count = getWishlistCount();
                                             title="<?= $p['is_liked'] ? 'Remove from wishlist' : 'Add to wishlist' ?>">
                                             <i class="bi bi-heart<?= $p['is_liked'] ? '-fill' : '' ?>"></i>
                                         </button>
-                                        <button class="product-action-btn" onclick="QuickView.open(<?= $p['id'] ?>)"
-                                            title="Quick View">
+                                        <button class="product-action-btn quickview-btn"
+                                            onclick="QuickView.open(<?= $p['id'] ?>)" title="Quick View">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
