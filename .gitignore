@@ -1,1 +1,23 @@
 *.sql
+
+# Composer
+/vendor/
+composer.lock
+
+# Environment / Credentials
+config/mail.php
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Uploads
+assets/images/products/*
+!assets/images/products/.gitkeep
