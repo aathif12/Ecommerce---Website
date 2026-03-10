@@ -1,0 +1,14 @@
+{
+    "name": "elecstore/ecommerce",
+    "description": "ElecStore E-Commerce",
+    "type": "project",
+    "authors": [
+        {
+            "name": "aathif12",
+            "email": "aathifahamad4@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^7.0"
+    }
+}
