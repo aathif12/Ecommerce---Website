@@ -1,5 +1,6 @@
 <?php
 require_once '../config/helpers.php';
+require_once '../config/mail.php';
 requireAdmin();
 
 $db = getDB();
@@ -13,7 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
     $allowed = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
     if (in_array($status, $allowed) && $id) {
         $db->query("UPDATE orders SET status='$status' WHERE id=$id");
-        echo json_encode(['success' => true, 'message' => 'Order status updated']);
+
+        // Send confirmation email when order is confirmed
+        $emailSent = false;
+        if ($status === 'confirmed') {
+            $order = $db->query("SELECT o.*, u.name as user_name, u.email as user_email
+                FROM orders o JOIN users u ON o.user_id=u.id WHERE o.id=$id")->fetch_assoc();
+            if ($order) {
+                $items = $db->query("SELECT oi.*, p.name, p.brand
+                    FROM order_items oi JOIN products p ON oi.product_id=p.id
+                    WHERE oi.order_id=$id")->fetch_all(MYSQLI_ASSOC);
+                $emailSent = sendOrderConfirmationEmail($order, $items);
+            }
+        }
+
+        $message = 'Order status updated';
+        if ($status === 'confirmed') {
+            $message .= $emailSent ? ' & confirmation email sent' : ' (email failed to send)';
+        }
+        echo json_encode(['success' => true, 'message' => $message]);
     } else {
         echo json_encode(['error' => 'Invalid request']);
     }
